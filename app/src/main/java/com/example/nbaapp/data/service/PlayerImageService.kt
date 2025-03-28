@@ -30,7 +30,8 @@ class PlayerImageService(
     }
 
     companion object {
-        private const val DEFAULT_IMAGE_URL = "https://masterbundles.com/wp-content/uploads/2023/03/fsf-490.png"
+        private const val DEFAULT_IMAGE_URL =
+            "https://masterbundles.com/wp-content/uploads/2023/03/fsf-490.png"
         private const val QUERY_NBA_PLAYER = "basketball player"
     }
 }
