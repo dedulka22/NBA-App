@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">NBA</string>
+    <string name="position">Position: %1$s</string>
+    <string name="height">Height: %1$s</string>
+    <string name="weight">Weight: %1$s</string>
+    <string name="jersey">Jersey Number: %1$s</string>
+    <string name="college">College: %1$s</string>
+    <string name="country">Country: %1$s</string>
+    <string name="draft_year">Draft Year: %1$s</string>
+    <string name="draft_round">Draft Round: %1$s</string>
+    <string name="draft_number">Draft Number: %1$s</string>
+    <string name="team">Team: %1$s</string>
+    <string name="abbreviation">Abbreviation: %1$s</string>
+    <string name="city">City: %1$s</string>
+    <string name="conference">Conference: %1$s</string>
+    <string name="division">Division: %1$s</string>
+    <string name="error_loading_players">Error loading players</string>
+</resources>
