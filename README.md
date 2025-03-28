@@ -19,6 +19,10 @@
 - **MockK** for mocking dependencies
 - **Kotlinx Coroutines Test** for testing coroutines
 
+## Data Sources:
+- **Ball Don't Lie API** for NBA player and team information
+- **Unsplash API** for player and team images
+
 ## License:
 This project is licensed under the **MIT License**, allowing free and open-source usage while ensuring attribution to the original author.
 
