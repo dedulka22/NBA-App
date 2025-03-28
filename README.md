@@ -12,7 +12,12 @@
 - **Paging 3** for efficient data loading and pagination  
 - **Glide** for image loading  
 - **Dark Mode & Light Mode** support  
-- **Dependency Injection with Koin**  
+- **Dependency Injection with Koin**
+
+## Testing:
+- **JUnit** for unit testing
+- **MockK** for mocking dependencies
+- **Kotlinx Coroutines Test** for testing coroutines
 
 ## License:
 This project is licensed under the **MIT License**, allowing free and open-source usage while ensuring attribution to the original author.
