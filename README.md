@@ -1,6 +1,8 @@
 # NBA App
 *A clean and structured Android application for exploring NBA players and their information, built using modern Android development practices.*
 
+![NBA Diagram](diagram/nba_diagram.png)
+
 ## Features:
 - **Jetpack Compose** for UI  
 - **Kotlin** as the main programming language  
