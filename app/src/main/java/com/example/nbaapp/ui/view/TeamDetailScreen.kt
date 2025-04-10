@@ -43,7 +43,6 @@ class TeamDetailScreen(
         )
 
         TeamDetailScreenContent(
-            teamId = teamId,
             teamDetailViewModel = teamDetailViewModel
         )
     }
@@ -51,12 +50,10 @@ class TeamDetailScreen(
 
 /**
  * Composable for displaying team details
- * @param teamId The id of the team
  * @param teamDetailViewModel The view model for the team details
  */
 @Composable
 fun TeamDetailScreenContent(
-    teamId: Int,
     teamDetailViewModel: TeamDetailViewModel
 ) {
 

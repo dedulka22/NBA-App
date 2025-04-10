@@ -53,7 +53,6 @@ data class PlayerDetailScreen(
         )
 
         PlayerDetailScreenContent(
-            playerId = playerId,
             viewModel = playerDetailViewModel,
             navigator = navigator
         )
@@ -62,13 +61,11 @@ data class PlayerDetailScreen(
 
 /**
  * Composable for displaying player details
- * @param playerId The ID of the player to display
  * @param viewModel The view model for the player details
  * @param navigator The navigator for the app
  */
 @Composable
 fun PlayerDetailScreenContent(
-    playerId: Int,
     viewModel: PlayerDetailViewModel,
     navigator: Navigator
 ) {
