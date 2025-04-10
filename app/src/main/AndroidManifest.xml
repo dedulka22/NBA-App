@@ -7,7 +7,6 @@
 
     <application
         android:name=".App"
-        android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/basketball_ball"
@@ -15,8 +14,7 @@
         android:roundIcon="@drawable/basketball_ball"
         android:supportsRtl="true"
         android:theme="@style/Theme.NBAApp"
-        tools:targetApi="31"
-        android:usesCleartextTraffic="true">
+        tools:targetApi="31">
         <activity
             android:name=".MainActivity"
             android:exported="true">
