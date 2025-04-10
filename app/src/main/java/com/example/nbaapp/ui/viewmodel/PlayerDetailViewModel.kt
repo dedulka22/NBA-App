@@ -14,13 +14,18 @@ import kotlinx.coroutines.launch
  * @param getPlayerDetailUseCase The use case for getting player details
  */
 class PlayerDetailViewModel(
-    private val getPlayerDetailUseCase: GetPlayerDetailUseCase
+    private val getPlayerDetailUseCase: GetPlayerDetailUseCase,
+    playerId: Int
 ) : ViewModel() {
 
     private val _playerDetail = MutableStateFlow<PlayerDetail?>(null)
     val playerDetail: StateFlow<PlayerDetail?> = _playerDetail.asStateFlow()
 
-    fun loadPlayerDetail(playerId: Int) {
+    init {
+        loadPlayerDetail(playerId)
+    }
+
+    private fun loadPlayerDetail(playerId: Int) {
         viewModelScope.launch {
             val fetchedPlayerDetail = getPlayerDetailUseCase(playerId)
             _playerDetail.value = fetchedPlayerDetail
