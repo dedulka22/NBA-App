@@ -14,13 +14,18 @@ import kotlinx.coroutines.launch
  * @param getTeamDetailUseCase The use case for getting team details
  */
 class TeamDetailViewModel(
-    private val getTeamDetailUseCase: GetTeamDetailUseCase
+    private val getTeamDetailUseCase: GetTeamDetailUseCase,
+    teamId: Int
 ) : ViewModel() {
 
     private val _teamDetail = MutableStateFlow<Team?>(null)
     val teamDetail: StateFlow<Team?> = _teamDetail.asStateFlow()
 
-    fun loadTeamDetail(teamId: Int) {
+    init {
+        loadTeamDetail(teamId)
+    }
+
+    private fun loadTeamDetail(teamId: Int) {
         viewModelScope.launch {
             val fetchedTeamDetail = getTeamDetailUseCase(teamId)
             _teamDetail.value = fetchedTeamDetail

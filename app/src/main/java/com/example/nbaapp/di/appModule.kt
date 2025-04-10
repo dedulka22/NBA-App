@@ -34,8 +34,8 @@ val appModule = module {
     single { GetTeamDetailUseCase(get()) }
 
     viewModel { PlayersViewModel(get()) }
-    viewModel { PlayerDetailViewModel(get()) }
-    viewModel { TeamDetailViewModel(get()) }
+    viewModel { PlayerDetailViewModel(get(), get()) }
+    viewModel { TeamDetailViewModel(get(), get()) }
 
     single<NBAApi> { ApiClient.nbaApi }
     single<UnsplashApi> { ApiClient.unsplashApi }

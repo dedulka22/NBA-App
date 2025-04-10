@@ -19,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,6 +33,7 @@ import com.example.nbaapp.R
 import com.example.nbaapp.domain.model.PlayerDetail
 import com.example.nbaapp.ui.viewmodel.PlayerDetailViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Screen for displaying player details
@@ -48,7 +48,9 @@ data class PlayerDetailScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val playerDetailViewModel: PlayerDetailViewModel = koinViewModel()
+        val playerDetailViewModel: PlayerDetailViewModel = koinViewModel(
+            parameters = { parametersOf(playerId) }
+        )
 
         PlayerDetailScreenContent(
             playerId = playerId,
@@ -71,10 +73,6 @@ fun PlayerDetailScreenContent(
     navigator: Navigator
 ) {
     val playerDetail by viewModel.playerDetail.collectAsState()
-
-    LaunchedEffect(playerId) {
-        viewModel.loadPlayerDetail(playerId)
-    }
 
     when (playerDetail) {
         null -> {
