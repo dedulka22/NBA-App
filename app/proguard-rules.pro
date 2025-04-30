@@ -1,21 +1,50 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# --- Keep annotations (important for Compose, Koin, Retrofit, etc.)
+-keepattributes *Annotation*
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# --- Jetpack Compose
+-keep class androidx.compose.** { *; }
+-dontwarn androidx.compose.**
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# --- Koin (Dependency Injection)
+-keep class org.koin.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# --- Retrofit + OkHttp
+-keep class retrofit2.** { *; }
+-keep class okhttp3.** { *; }
+-dontwarn okhttp3.**
+-dontwarn retrofit2.**
+
+# --- Gson (used with GsonConverterFactory)
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.google.gson.** { *; }
+-dontwarn com.google.gson.**
+
+# --- ViewModels
+-keep class **ViewModel { *; }
+
+# --- Voyager (navigation library)
+-keep class cafe.adriel.voyager.** { *; }
+-dontwarn cafe.adriel.voyager.**
+
+# --- Glide (image loading)
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public class * extends com.bumptech.glide.GeneratedAppGlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** { *; }
+-dontwarn com.bumptech.glide.**
+
+# --- Paging 3 (pagination library)
+-keep class androidx.paging.** { *; }
+-dontwarn androidx.paging.**
+
+# --- Logging - remove logs from release builds
+-assumenosideeffects class android.util.Log {
+    public static *** d(...);
+    public static *** i(...);
+    public static *** v(...);
+}
+
+# --- Keep constructors for dependency injection and reflection
+-keepclassmembers class * {
+    public <init>(...);
+}

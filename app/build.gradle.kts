@@ -34,11 +34,12 @@ android {
         release {
             buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY") ?: "default_key"}\"")
             buildConfigField("String", "CLIENT_ID", "\"${project.findProperty("CLIENT_ID") ?: "default_key"}\"")
-            isMinifyEnabled = false
+            isMinifyEnabled = true // Enable code minification
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            isShrinkResources = true // Enable resource shrinking
         }
     }
     compileOptions {
