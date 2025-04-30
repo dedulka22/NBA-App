@@ -1,10 +1,9 @@
-package com.example.nbaapp.data
+package com.example.nbaapp.data.repository
 
 import com.example.nbaapp.data.api.NBAApi
 import com.example.nbaapp.data.model.PlayerDetailData
 import com.example.nbaapp.data.model.PlayerDetailResponse
 import com.example.nbaapp.data.model.TeamDto
-import com.example.nbaapp.data.repository.PlayerDetailRepositoryImpl
 import com.example.nbaapp.data.service.PlayerImageService
 import com.example.nbaapp.domain.model.Team
 import io.mockk.coEvery
