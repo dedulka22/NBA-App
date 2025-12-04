@@ -30,7 +30,10 @@ data class TeamDto(
     @SerializedName("full_name") val fullName: String,
     val abbreviation: String
 ) {
-    fun toDomain(image: String? = ""): Team {
+    /**
+     * Converts TeamDto to domain model Team.
+     */
+    fun toDomain(): Team {
         return Team(
             id = id,
             conference = conference,
@@ -38,8 +41,7 @@ data class TeamDto(
             abbreviation = abbreviation,
             city = city,
             name = name,
-            fullName = fullName,
-            image = image ?: ""
+            fullName = fullName
         )
     }
 }

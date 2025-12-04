@@ -4,7 +4,6 @@ import com.example.nbaapp.data.api.NBAApi
 import com.example.nbaapp.data.model.PlayerDetailData
 import com.example.nbaapp.data.model.PlayerDetailResponse
 import com.example.nbaapp.data.model.TeamDto
-import com.example.nbaapp.data.service.PlayerImageService
 import com.example.nbaapp.domain.model.Team
 import io.mockk.coEvery
 import io.mockk.every
@@ -12,7 +11,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
@@ -20,7 +18,6 @@ import org.junit.Test
 class PlayerDetailRepositoryTest {
 
     private lateinit var repository: PlayerDetailRepositoryImpl
-    private lateinit var service: PlayerImageService
     private lateinit var mockApi: NBAApi
     private lateinit var mockTeamDto: TeamDto
 
@@ -28,9 +25,8 @@ class PlayerDetailRepositoryTest {
     fun setup() {
         // Mocking dependencies
         mockApi = mockk()
-        service = mockk()
         mockTeamDto = mockk()
-        repository = PlayerDetailRepositoryImpl(mockApi, service)
+        repository = PlayerDetailRepositoryImpl(mockApi)
     }
 
     @Test
@@ -53,11 +49,17 @@ class PlayerDetailRepositoryTest {
             draftNumber = 16
         )
         val mockPlayerDetailResponse = PlayerDetailResponse(data = mockPlayerDetailData)
-        val mockTeam = Team(id = 1, name = "Team A", abbreviation = "TA", city = "City A", conference = "Conference A",
-            division = "Division A", fullName = "Team A (TA)", image = "team_image")
+        val mockTeam = Team(
+            id = 1,
+            name = "Team A",
+            abbreviation = "TA",
+            city = "City A",
+            conference = "Conference A",
+            division = "Division A",
+            fullName = "Team A (TA)"
+        )
 
         coEvery { mockApi.getPlayerById(playerId) } returns mockPlayerDetailResponse
-        coEvery { service.getNBAImage(playerId) } returns "image_url"
         every { mockTeamDto.toDomain() } returns mockTeam
 
         // Act
@@ -79,20 +81,17 @@ class PlayerDetailRepositoryTest {
     }
 
     @Test
-    fun shouldReturnNullWhenApiCallFails() = runTest {
+    fun shouldThrowExceptionWhenApiCallFails() = runTest {
         // Arrange
         val playerId = 2
         coEvery { mockApi.getPlayerById(playerId) } throws RuntimeException("Network error")
-        coEvery { service.getNBAImage(playerId) } returns "image_url"
 
-        // Act
-        val result = try {
+        // Act & Assert
+        try {
             repository.getPlayerDetail(playerId)
+            assert(false) { "Expected RuntimeException to be thrown" }
         } catch (e: RuntimeException) {
-            null
+            assertEquals("Network error", e.message)
         }
-
-        // Assert
-        assertNull(result)
     }
 }

@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.example.nbaapp.R
 import com.example.nbaapp.domain.model.Team
+import com.example.nbaapp.ui.model.TeamUiModel
+import com.example.nbaapp.ui.util.UiState
 import com.example.nbaapp.ui.viewmodel.TeamDetailViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -56,25 +58,30 @@ class TeamDetailScreen(
 fun TeamDetailScreenContent(
     teamDetailViewModel: TeamDetailViewModel
 ) {
+    val teamDetailState by teamDetailViewModel.teamDetail.collectAsState()
 
-    val teamDetail by teamDetailViewModel.teamDetail.collectAsState()
-
-    when (teamDetail) {
-        null -> {
+    when (val state = teamDetailState) {
+        is UiState.Initial,
+        is UiState.Loading -> {
             BasketballCircularProgressIndicator()
         }
 
-        else -> {
-            teamDetail?.let { 
-                TeamDetailContent(it)
-            }
+        is UiState.Success -> {
+            TeamDetailContent(state.data)
+        }
+
+        is UiState.Error -> {
+            ErrorScreen(
+                message = state.message,
+                onRetry = { /* viewModel.retry() - would need teamId */ }
+            )
         }
     }
 }
 
 @Composable
 fun TeamDetailContent(
-    teamDetail: Team
+    teamDetailUi: TeamUiModel
 ) {
     val scrollState = rememberScrollState()
 
@@ -90,25 +97,25 @@ fun TeamDetailContent(
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                GlideImage(teamDetail.image)
+                GlideImage(teamDetailUi.imageUrl)
                 Text(
-                    text = teamDetail.fullName,
+                    text = teamDetailUi.fullName,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         color = MaterialTheme.colorScheme.primary
                     ),
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                 )
 
-                Text(stringResource(id = R.string.abbreviation, teamDetail.abbreviation))
+                Text(stringResource(id = R.string.abbreviation, teamDetailUi.abbreviation))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.city, teamDetail.city))
+                Text(stringResource(id = R.string.city, teamDetailUi.city))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.conference, teamDetail.conference))
+                Text(stringResource(id = R.string.conference, teamDetailUi.conference))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.division, teamDetail.division))
+                Text(stringResource(id = R.string.division, teamDetailUi.division))
             }
         }
     }

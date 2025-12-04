@@ -30,7 +30,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.nbaapp.R
-import com.example.nbaapp.domain.model.PlayerDetail
+import com.example.nbaapp.ui.model.PlayerDetailUiModel
+import com.example.nbaapp.ui.util.UiState
 import com.example.nbaapp.ui.viewmodel.PlayerDetailViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -69,31 +70,37 @@ fun PlayerDetailScreenContent(
     viewModel: PlayerDetailViewModel,
     navigator: Navigator
 ) {
-    val playerDetail by viewModel.playerDetail.collectAsState()
+    val playerDetailState by viewModel.playerDetail.collectAsState()
 
-    when (playerDetail) {
-        null -> {
+    when (val state = playerDetailState) {
+        is UiState.Initial,
+        is UiState.Loading -> {
             BasketballCircularProgressIndicator()
         }
 
-        else -> {
-            playerDetail?.let {
-                PlayerDetailContent(it) { teamId ->
-                    navigator.push(TeamDetailScreen(teamId))
-                }
+        is UiState.Success -> {
+            PlayerDetailContent(state.data) { teamId ->
+                navigator.push(TeamDetailScreen(teamId))
             }
+        }
+
+        is UiState.Error -> {
+            ErrorScreen(
+                message = state.message,
+                onRetry = { /* viewModel.retry() - would need playerId */ }
+            )
         }
     }
 }
 
 /**
  * Composable for displaying player details
- * @param playerDetail The player details to display
+ * @param playerDetailUi The player details UI model to display
  * @param onTeamClick The callback for when the team is clicked
  */
 @Composable
 fun PlayerDetailContent(
-    playerDetail: PlayerDetail,
+    playerDetailUi: PlayerDetailUiModel,
     onTeamClick: (Int) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -113,50 +120,50 @@ fun PlayerDetailContent(
                 modifier = Modifier
                     .padding(16.dp)
             ) {
-                GlideImage(playerDetail.image)
+                GlideImage(playerDetailUi.imageUrl)
                 Text(
-                    text = "${playerDetail.firstName} ${playerDetail.lastName}",
+                    text = playerDetailUi.fullName,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         color = MaterialTheme.colorScheme.primary
                     ),
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                 )
 
-                Text(stringResource(id = R.string.position, playerDetail.position))
+                Text(stringResource(id = R.string.position, playerDetailUi.position))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.height, playerDetail.height))
+                Text(stringResource(id = R.string.height, playerDetailUi.height))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.weight, playerDetail.weight))
+                Text(stringResource(id = R.string.weight, playerDetailUi.weight))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.jersey, playerDetail.jerseyNumber))
+                Text(stringResource(id = R.string.jersey, playerDetailUi.jerseyNumber))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.college, playerDetail.college))
+                Text(stringResource(id = R.string.college, playerDetailUi.college))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.country, playerDetail.country))
+                Text(stringResource(id = R.string.country, playerDetailUi.country))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.draft_year, playerDetail.draftYear))
+                Text(stringResource(id = R.string.draft_year, playerDetailUi.draftYear))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.draft_round, playerDetail.draftRound))
+                Text(stringResource(id = R.string.draft_round, playerDetailUi.draftRound))
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(stringResource(id = R.string.draft_number, playerDetail.draftNumber))
+                Text(stringResource(id = R.string.draft_number, playerDetailUi.draftNumber))
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onTeamClick(playerDetail.team.id) },
+                        .clickable { onTeamClick(playerDetailUi.team.id) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = stringResource(id = R.string.team, playerDetail.team.fullName),
+                        text = stringResource(id = R.string.team, playerDetailUi.team.fullName),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary,
                     )

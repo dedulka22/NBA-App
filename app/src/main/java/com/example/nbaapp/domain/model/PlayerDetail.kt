@@ -1,7 +1,9 @@
 package com.example.nbaapp.domain.model
 
 /**
- * Data class for player details
+ * Domain model for player details.
+ * This model represents pure business data without UI-specific properties.
+ *
  * @param id The player ID
  * @param firstName The player first name
  * @param lastName The player last name
@@ -15,7 +17,6 @@ package com.example.nbaapp.domain.model
  * @param draftYear The player draft year
  * @param draftRound The player draft round
  * @param draftNumber The player draft number
- * @param image The player image
  */
 data class PlayerDetail(
     val id: Int,
@@ -30,6 +31,5 @@ data class PlayerDetail(
     val team: Team,
     val draftYear: Int,
     val draftRound: Int,
-    val draftNumber: Int,
-    val image: String
+    val draftNumber: Int
 )

@@ -1,6 +1,7 @@
 package com.example.nbaapp.domain.usecase
 
 import com.example.nbaapp.domain.model.PlayerDetail
+import com.example.nbaapp.domain.repository.ImageRepository
 import com.example.nbaapp.domain.repository.PlayerDetailRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -25,13 +26,15 @@ class GetPlayerDetailUseCaseTest {
     private val dispatcher = UnconfinedTestDispatcher()
     private val testScope = TestScope(dispatcher)
     private lateinit var useCase: GetPlayerDetailUseCase
-    private lateinit var mockRepository: PlayerDetailRepository
+    private lateinit var mockPlayerRepository: PlayerDetailRepository
+    private lateinit var mockImageRepository: ImageRepository
 
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        mockRepository = mockk()
-        useCase = GetPlayerDetailUseCase(mockRepository)
+        mockPlayerRepository = mockk()
+        mockImageRepository = mockk()
+        useCase = GetPlayerDetailUseCase(mockPlayerRepository, mockImageRepository)
     }
 
     @After
@@ -42,7 +45,7 @@ class GetPlayerDetailUseCaseTest {
     }
 
     @Test
-    fun invokeShouldReturnPlayerDetail() = runTest {
+    fun invokeShouldReturnPlayerDetailUiModel() = runTest {
         testScope.launch {
             // Arrange
             val playerId = 1
@@ -59,16 +62,21 @@ class GetPlayerDetailUseCaseTest {
                 team = mockk(),
                 draftYear = 1990,
                 draftRound = 1,
-                draftNumber = 16,
-                image = "player_image"
+                draftNumber = 16
             )
-            coEvery { mockRepository.getPlayerDetail(playerId) } returns mockPlayerDetail
+            val mockImageUrl = "https://example.com/player.jpg"
+
+            coEvery { mockPlayerRepository.getPlayerDetail(playerId) } returns mockPlayerDetail
+            coEvery { mockImageRepository.getImageUrl(any()) } returns mockImageUrl
 
             // Act
             val result = useCase(playerId)
 
             // Assert
-            assertEquals(mockPlayerDetail, result)
+            assertEquals(mockPlayerDetail.id, result.id)
+            assertEquals(mockPlayerDetail.firstName, result.firstName)
+            assertEquals(mockPlayerDetail.lastName, result.lastName)
+            assertEquals(mockImageUrl, result.imageUrl)
         }
     }
 }

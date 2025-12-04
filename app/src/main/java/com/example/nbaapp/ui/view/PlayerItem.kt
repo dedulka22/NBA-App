@@ -58,7 +58,7 @@ fun PlayerItem(
                     modifier = Modifier.padding(bottom = 2.dp)
                 )
                 Text(
-                    text = stringResource(id = R.string.team, player.firstName + " " + player.lastName),
+                    text = stringResource(id = R.string.team, player.team.fullName),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 2.dp)
                 )

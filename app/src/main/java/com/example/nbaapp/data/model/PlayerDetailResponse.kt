@@ -43,24 +43,24 @@ data class PlayerDetailData(
     @SerializedName("draft_number") val draftNumber: Int
 )
 
-fun PlayerDetailResponse.toDomain(image: String): PlayerDetail {
+/**
+ * Converts PlayerDetailResponse to domain model PlayerDetail.
+ */
+fun PlayerDetailResponse.toDomain(): PlayerDetail {
     val playerData = this.data
-    return playerData.let {
-        PlayerDetail(
-            id = it.id,
-            firstName = it.firstName,
-            lastName = it.lastName,
-            position = it.position,
-            height = it.height,
-            weight = it.weight,
-            jerseyNumber = it.jerseyNumber,
-            college = it.college,
-            country = it.country,
-            team = it.team.toDomain(),
-            draftYear = it.draftYear,
-            draftRound = it.draftRound,
-            draftNumber = it.draftNumber,
-            image = image
-        )
-    }
+    return PlayerDetail(
+        id = playerData.id,
+        firstName = playerData.firstName,
+        lastName = playerData.lastName,
+        position = playerData.position,
+        height = playerData.height,
+        weight = playerData.weight,
+        jerseyNumber = playerData.jerseyNumber,
+        college = playerData.college,
+        country = playerData.country,
+        team = playerData.team.toDomain(),
+        draftYear = playerData.draftYear,
+        draftRound = playerData.draftRound,
+        draftNumber = playerData.draftNumber
+    )
 }
