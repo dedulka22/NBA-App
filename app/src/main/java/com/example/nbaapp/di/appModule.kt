@@ -1,5 +1,6 @@
 package com.example.nbaapp.di
 
+import androidx.room.Room
 import com.example.nbaapp.BuildConfig
 import com.example.nbaapp.data.api.NBAApi
 import com.example.nbaapp.data.api.UnsplashApi
@@ -9,10 +10,12 @@ import com.example.nbaapp.data.api.provideNBARetrofit
 import com.example.nbaapp.data.api.provideUnsplashApi
 import com.example.nbaapp.data.api.provideUnsplashOkHttpClient
 import com.example.nbaapp.data.api.provideUnsplashRetrofit
+import com.example.nbaapp.data.local.NBADatabase
 import com.example.nbaapp.data.repository.PlayerDetailRepositoryImpl
 import com.example.nbaapp.data.repository.PlayerRepositoryImpl
 import com.example.nbaapp.data.repository.TeamDetailRepositoryImpl
 import com.example.nbaapp.data.repository.UnsplashImageRepositoryImpl
+import com.example.nbaapp.data.util.NetworkConnectivityObserver
 import com.example.nbaapp.domain.repository.ImageRepository
 import com.example.nbaapp.domain.repository.PlayerDetailRepository
 import com.example.nbaapp.domain.repository.PlayerRepository
@@ -20,6 +23,7 @@ import com.example.nbaapp.domain.repository.TeamDetailRepository
 import com.example.nbaapp.domain.usecase.GetPlayerDetailUseCase
 import com.example.nbaapp.domain.usecase.GetPlayersUseCase
 import com.example.nbaapp.domain.usecase.GetTeamDetailUseCase
+import com.example.nbaapp.domain.util.ConnectivityObserver
 import com.example.nbaapp.ui.viewmodel.PlayerDetailViewModel
 import com.example.nbaapp.ui.viewmodel.PlayersViewModel
 import com.example.nbaapp.ui.viewmodel.TeamDetailViewModel
@@ -37,12 +41,13 @@ val networkModule = module {
     // NBA OkHttpClient
     single(qualifier = named("nba")) {
         provideNBAOkHttpClient(
+            cacheDir = androidContext().cacheDir,
             apiKey = BuildConfig.API_KEY,
             isDebug = BuildConfig.DEBUG
         )
     }
 
-    // Unsplash OkHttpClient  
+    // Unsplash OkHttpClient
     single(qualifier = named("unsplash")) {
         provideUnsplashOkHttpClient(
             clientId = BuildConfig.CLIENT_ID,
@@ -70,13 +75,34 @@ val networkModule = module {
 }
 
 /**
- * Data module - provides repository implementations
+ * Database module - provides Room database and DAOs
+ */
+private const val DATABASE_NAME = "nba_database"
+
+val databaseModule = module {
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            NBADatabase::class.java,
+            DATABASE_NAME
+        ).build()
+    }
+
+    single { get<NBADatabase>().playerDao() }
+    single { get<NBADatabase>().playerDetailDao() }
+    single { get<NBADatabase>().teamDao() }
+    single { get<NBADatabase>().remoteKeyDao() }
+}
+
+/**
+ * Data module - provides repository implementations and connectivity
  */
 val dataModule = module {
-    factory<PlayerRepository> { PlayerRepositoryImpl(get()) }
-    factory<PlayerDetailRepository> { PlayerDetailRepositoryImpl(get()) }
-    factory<TeamDetailRepository> { TeamDetailRepositoryImpl(get()) }
-    factory<ImageRepository> { UnsplashImageRepositoryImpl(get()) }
+    factory<PlayerRepository> { PlayerRepositoryImpl(get(), get()) }
+    factory<PlayerDetailRepository> { PlayerDetailRepositoryImpl(get(), get(), get(), get()) }
+    factory<TeamDetailRepository> { TeamDetailRepositoryImpl(get(), get(), get()) }
+    factory<ImageRepository> { UnsplashImageRepositoryImpl(get(), get()) }
+    single<ConnectivityObserver> { NetworkConnectivityObserver(androidContext()) }
 }
 
 /**
@@ -92,13 +118,9 @@ val domainModule = module {
  * UI module - provides ViewModels
  */
 val uiModule = module {
-    viewModel { PlayersViewModel(get()) }
-    viewModel { (playerId: Int) ->
-        PlayerDetailViewModel(get(), playerId)
-    }
-    viewModel { (teamId: Int) ->
-        TeamDetailViewModel(get(), teamId)
-    }
+    viewModel { PlayersViewModel(get(), get()) }
+    viewModel { PlayerDetailViewModel(get(), get(), get()) }
+    viewModel { TeamDetailViewModel(get(), get(), get()) }
 }
 
 /**
@@ -106,6 +128,7 @@ val uiModule = module {
  */
 val appModule = listOf(
     networkModule,
+    databaseModule,
     dataModule,
     domainModule,
     uiModule

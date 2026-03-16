@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.nbaapp.R
@@ -52,7 +53,7 @@ fun BasketballCircularProgressIndicator() {
 
         Image(
             painter = painterResource(id = R.drawable.basketball_ball),
-            contentDescription = "Basketball Loading",
+            contentDescription = stringResource(id = R.string.content_description_basketball_loading),
             modifier = Modifier
                 .size(100.dp)
         )

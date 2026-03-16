@@ -1,7 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kover)
+}
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(localPropertiesFile.inputStream())
+    }
 }
 
 android {
@@ -28,12 +40,12 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY") ?: "default_key"}\"")
-            buildConfigField("String", "CLIENT_ID", "\"${project.findProperty("CLIENT_ID") ?: "default_key"}\"")
+            buildConfigField("String", "API_KEY", "\"${localProperties.getProperty("API_KEY", "default_key")}\"")
+            buildConfigField("String", "CLIENT_ID", "\"${localProperties.getProperty("CLIENT_ID", "default_key")}\"")
         }
         release {
-            buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY") ?: "default_key"}\"")
-            buildConfigField("String", "CLIENT_ID", "\"${project.findProperty("CLIENT_ID") ?: "default_key"}\"")
+            buildConfigField("String", "API_KEY", "\"${localProperties.getProperty("API_KEY", "default_key")}\"")
+            buildConfigField("String", "CLIENT_ID", "\"${localProperties.getProperty("CLIENT_ID", "default_key")}\"")
             isMinifyEnabled = true // Enable code minification
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -54,9 +66,7 @@ android {
         buildConfig = true
     }
     testOptions {
-        unitTests.all {
-            it.useJUnitPlatform()
-        }
+        unitTests.isReturnDefaultValues = true
     }
 }
 
@@ -76,8 +86,15 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
 
-    // Voyager for navigation
-    implementation(libs.voyager.navigator)
+    // Navigation Compose
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+    // Room for offline caching
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.room.paging)
+    ksp(libs.room.compiler)
 
     // Glide for image loading
     implementation(libs.bumptech.glide)
@@ -87,7 +104,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 
@@ -97,6 +113,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

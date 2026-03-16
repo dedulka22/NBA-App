@@ -1,5 +1,6 @@
 package com.example.nbaapp.ui.view
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,18 +13,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.nbaapp.R
 
 /**
  * Generic error screen component.
  *
- * @param message The error message to display
+ * @param messageResId The string resource ID for the error message
+ * @param formatArgs Optional format arguments for the string resource
  * @param onRetry Optional callback for retry action
  */
 @Composable
 fun ErrorScreen(
-    message: String,
+    @StringRes messageResId: Int,
+    formatArgs: List<Any> = emptyList(),
     onRetry: (() -> Unit)? = null
 ) {
     Column(
@@ -34,7 +39,7 @@ fun ErrorScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Error",
+            text = stringResource(id = R.string.error_title),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.error
         )
@@ -42,7 +47,7 @@ fun ErrorScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = message,
+            text = stringResource(id = messageResId, *formatArgs.toTypedArray()),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
@@ -50,7 +55,7 @@ fun ErrorScreen(
         onRetry?.let {
             Spacer(modifier = Modifier.height(24.dp))
             Button(onClick = it) {
-                Text("Retry")
+                Text(stringResource(id = R.string.retry))
             }
         }
     }

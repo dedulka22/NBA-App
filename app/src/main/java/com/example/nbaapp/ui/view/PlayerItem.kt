@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.nbaapp.R
 import com.example.nbaapp.domain.model.Player
@@ -28,11 +30,13 @@ fun PlayerItem(
     player: Player,
     onOpenDetails: () -> Unit
 ) {
+    val playerName = "${player.firstName} ${player.lastName}"
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
-            .shadow(4.dp, shape = RoundedCornerShape(16.dp)),
+            .shadow(4.dp, shape = RoundedCornerShape(16.dp))
+            .semantics { contentDescription = playerName },
         shape = RoundedCornerShape(16.dp),
         onClick = onOpenDetails
     ) {

@@ -19,58 +19,28 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.nbaapp.R
 import com.example.nbaapp.ui.model.PlayerDetailUiModel
 import com.example.nbaapp.ui.util.UiState
 import com.example.nbaapp.ui.viewmodel.PlayerDetailViewModel
-import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
-
-/**
- * Screen for displaying player details
- */
-data class PlayerDetailScreen(
-    private val playerId: Int
-) : Screen {
-
-    override val key: String
-        get() = "Player Detail"
-
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val playerDetailViewModel: PlayerDetailViewModel = koinViewModel(
-            parameters = { parametersOf(playerId) }
-        )
-
-        PlayerDetailScreenContent(
-            viewModel = playerDetailViewModel,
-            navigator = navigator
-        )
-    }
-}
 
 /**
  * Composable for displaying player details
  * @param viewModel The view model for the player details
- * @param navigator The navigator for the app
+ * @param onTeamClick Callback when the team is clicked
  */
 @Composable
 fun PlayerDetailScreenContent(
     viewModel: PlayerDetailViewModel,
-    navigator: Navigator
+    onTeamClick: (Int) -> Unit
 ) {
-    val playerDetailState by viewModel.playerDetail.collectAsState()
+    val playerDetailState by viewModel.playerDetail.collectAsStateWithLifecycle()
 
     when (val state = playerDetailState) {
         is UiState.Initial,
@@ -79,15 +49,14 @@ fun PlayerDetailScreenContent(
         }
 
         is UiState.Success -> {
-            PlayerDetailContent(state.data) { teamId ->
-                navigator.push(TeamDetailScreen(teamId))
-            }
+            PlayerDetailContent(state.data, onTeamClick)
         }
 
         is UiState.Error -> {
             ErrorScreen(
-                message = state.message,
-                onRetry = { /* viewModel.retry() - would need playerId */ }
+                messageResId = state.messageResId,
+                formatArgs = state.formatArgs,
+                onRetry = { viewModel.retry() }
             )
         }
     }
@@ -169,7 +138,7 @@ fun PlayerDetailContent(
                     )
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Team Detail",
+                        contentDescription = stringResource(id = R.string.content_description_team_detail),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = 4.dp)
                     )

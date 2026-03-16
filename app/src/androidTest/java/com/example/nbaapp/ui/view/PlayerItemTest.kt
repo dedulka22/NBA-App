@@ -19,7 +19,6 @@ class PlayerItemTest {
 
     @Test
     fun playerItemDisplaysPlayerDetails() {
-        // Mock player data
         val mockPlayer = Player(
             id = 1,
             firstName = "LeBron",
@@ -32,12 +31,10 @@ class PlayerItemTest {
                 city = "Los Angeles",
                 conference = "Western",
                 division = "Pacific",
-                image = "https://example.com/lakers.png",
-                name = "Los Angeles Lakers"
+                name = "Lakers"
             )
         )
 
-        // Set the content of the composable
         composeTestRule.setContent {
             PlayerItem(
                 player = mockPlayer,
@@ -45,15 +42,13 @@ class PlayerItemTest {
             )
         }
 
-        // Assert that the player's name, position, and team are displayed
         composeTestRule.onNodeWithText("LeBron James").assertIsDisplayed()
         composeTestRule.onNodeWithText("Position: Forward").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Team: LeBron James").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Team: Los Angeles Lakers").assertIsDisplayed()
     }
 
     @Test
     fun playerItemTriggersOnOpenDetails() {
-        // Mock player data
         val mockPlayer = Player(
             id = 1,
             firstName = "LeBron",
@@ -66,14 +61,12 @@ class PlayerItemTest {
                 city = "Los Angeles",
                 conference = "Western",
                 division = "Pacific",
-                image = "https://example.com/lakers.png",
-                name = "Los Angeles Lakers"
+                name = "Lakers"
             )
         )
 
         var wasClicked = false
 
-        // Set the content of the composable
         composeTestRule.setContent {
             PlayerItem(
                 player = mockPlayer,
@@ -81,10 +74,8 @@ class PlayerItemTest {
             )
         }
 
-        // Perform click on the card
         composeTestRule.onNodeWithText("LeBron James").performClick()
 
-        // Assert that the click callback was triggered
         assert(wasClicked)
     }
 }

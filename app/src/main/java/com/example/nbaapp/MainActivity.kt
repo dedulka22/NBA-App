@@ -1,6 +1,5 @@
 package com.example.nbaapp
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,21 +21,33 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.CurrentScreen
-import cafe.adriel.voyager.navigator.Navigator
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.nbaapp.ui.navigation.PlayerDetailRoute
+import com.example.nbaapp.ui.navigation.PlayersRoute
+import com.example.nbaapp.ui.navigation.TeamDetailRoute
 import com.example.nbaapp.ui.theme.NBAAppTheme
-import com.example.nbaapp.ui.view.PlayersScreen
+import com.example.nbaapp.ui.view.PlayerDetailScreenContent
+import com.example.nbaapp.ui.view.PlayersScreenContent
+import com.example.nbaapp.ui.view.TeamDetailScreenContent
+import com.example.nbaapp.ui.viewmodel.PlayerDetailViewModel
+import com.example.nbaapp.ui.viewmodel.PlayersViewModel
+import com.example.nbaapp.ui.viewmodel.TeamDetailViewModel
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Main activity for the NBA App
  */
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -46,53 +57,87 @@ class MainActivity : ComponentActivity() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NBAApp() {
     NBAAppTheme {
-        Navigator(PlayersScreen) { navigator ->
-            val currentScreen = navigator.items.lastOrNull() ?: PlayersScreen
+        val navController = rememberNavController()
+        val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
-            Scaffold(
-                modifier = Modifier
-                    .windowInsetsPadding(WindowInsets.safeDrawing)
-                    .fillMaxSize(),
-                topBar = {
-                    Surface(shadowElevation = 4.dp) {
-                        TopAppBar(
-                            title = {
-                                Row {
+        val currentRoute = currentBackStackEntry?.destination?.route
+
+        val screenTitle = when {
+            currentRoute?.contains("PlayerDetailRoute") == true
+                -> stringResource(R.string.screen_title_player_detail)
+            currentRoute?.contains("TeamDetailRoute") == true
+                -> stringResource(R.string.screen_title_team_detail)
+            else -> stringResource(R.string.screen_title_players)
+        }
+        val showBackButton = currentRoute?.contains("PlayersRoute") != true
+
+        Scaffold(
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .fillMaxSize(),
+            topBar = {
+                Surface(shadowElevation = 4.dp) {
+                    TopAppBar(
+                        title = {
+                            Row {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.basketball_ball),
+                                    contentDescription = stringResource(id = R.string.content_description_basketball_icon),
+                                    modifier = Modifier
+                                        .size(26.dp)
+                                        .padding(end = 8.dp)
+                                )
+                                Text(screenTitle)
+                            }
+                        },
+                        navigationIcon = {
+                            if (showBackButton) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
                                     Icon(
-                                        imageVector = ImageVector.vectorResource(id = R.drawable.basketball_ball),
-                                        contentDescription = "Basketball Icon",
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = stringResource(id = R.string.content_description_back),
                                         modifier = Modifier
-                                            .size(26.dp)
                                             .padding(end = 8.dp)
+                                            .clickable { navController.popBackStack() },
                                     )
-                                    Text(currentScreen.key)
                                 }
-                            },
-                            navigationIcon = {
-                                if (currentScreen !is PlayersScreen) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                            contentDescription = "Back",
-                                            modifier = Modifier
-                                                .padding(end = 8.dp)
-                                                .clickable { navigator.pop() },
-                                        )
-                                    }
-                                }
-                            },
-                        )
-                    }
+                            }
+                        },
+                    )
                 }
-            ) { paddingValues ->
-                Column(modifier = Modifier.padding(paddingValues)) {
-                    CurrentScreen()
+            }
+        ) { paddingValues ->
+            NavHost(
+                navController = navController,
+                startDestination = PlayersRoute,
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                composable<PlayersRoute> {
+                    val viewModel: PlayersViewModel = koinViewModel()
+                    PlayersScreenContent(
+                        viewModel = viewModel,
+                        onPlayerClick = { playerId ->
+                            navController.navigate(PlayerDetailRoute(playerId))
+                        }
+                    )
+                }
+                composable<PlayerDetailRoute> {
+                    val viewModel: PlayerDetailViewModel = koinViewModel()
+                    PlayerDetailScreenContent(
+                        viewModel = viewModel,
+                        onTeamClick = { teamId ->
+                            navController.navigate(TeamDetailRoute(teamId))
+                        }
+                    )
+                }
+                composable<TeamDetailRoute> {
+                    val viewModel: TeamDetailViewModel = koinViewModel()
+                    TeamDetailScreenContent(teamDetailViewModel = viewModel)
                 }
             }
         }

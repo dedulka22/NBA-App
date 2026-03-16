@@ -12,19 +12,29 @@ import retrofit2.http.Query
  */
 interface NBAApi {
 
-    @GET("players")
+    @GET(ENDPOINT_PLAYERS)
     suspend fun getPlayers(
-        @Query("cursor") cursor: Int,
-        @Query("per_page") perPage: Int = 35,
+        @Query(PARAM_CURSOR) cursor: Int,
+        @Query(PARAM_PER_PAGE) perPage: Int = DEFAULT_PER_PAGE,
     ): PlayerResponse
 
-    @GET("players/{id}")
+    @GET(ENDPOINT_PLAYER_DETAIL)
     suspend fun getPlayerById(
-        @Path("id") id: Int
+        @Path(PARAM_ID) id: Int
     ): PlayerDetailResponse
 
-    @GET("teams/{id}")
+    @GET(ENDPOINT_TEAM_DETAIL)
     suspend fun getTeamById(
-        @Path("id") id: Int
+        @Path(PARAM_ID) id: Int
     ): TeamResponse
+
+    companion object {
+        const val ENDPOINT_PLAYERS = "players"
+        const val ENDPOINT_PLAYER_DETAIL = "players/{id}"
+        const val ENDPOINT_TEAM_DETAIL = "teams/{id}"
+        const val PARAM_CURSOR = "cursor"
+        const val PARAM_PER_PAGE = "per_page"
+        const val PARAM_ID = "id"
+        const val DEFAULT_PER_PAGE = 100
+    }
 }

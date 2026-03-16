@@ -9,60 +9,47 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.nbaapp.R
+import com.example.nbaapp.domain.util.DataException
 import com.example.nbaapp.ui.viewmodel.PlayersViewModel
-import org.koin.androidx.compose.koinViewModel
 
-/**
- * Screen for displaying the list of players
- */
-object PlayersScreen : Screen {
-    private fun readResolve(): Any = PlayersScreen
-
-    override val key: String
-        get() = "National Basketball Association"
-
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val playersViewModel: PlayersViewModel = koinViewModel()
-        PlayersScreenContent(viewModel = playersViewModel, navigator = navigator)
-    }
-}
-
-/**
- * Composable for displaying the list of players
- * @param viewModel The view model for the players
- * @param navigator The navigator for the app
- */
 @Composable
 fun PlayersScreenContent(
     viewModel: PlayersViewModel,
-    navigator: Navigator
+    onPlayerClick: (Int) -> Unit
 ) {
     val players = viewModel.players.collectAsLazyPagingItems()
     val loadState = players.loadState
+    val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
+
+    // Auto-retry when connectivity is restored
+    LaunchedEffect(isConnected) {
+        if (isConnected && loadState.refresh is LoadState.Error) {
+            players.retry()
+        }
+    }
 
     // Handle refresh state (initial loading)
-    when (loadState.refresh) {
+    when (val refresh = loadState.refresh) {
         is LoadState.Loading -> {
             BasketballCircularProgressIndicator()
             return
         }
 
         is LoadState.Error -> {
+            val (messageResId, formatArgs) = errorMessageFor(refresh.error)
             ErrorScreen(
-                message = stringResource(id = R.string.error_loading_players),
+                messageResId = messageResId,
+                formatArgs = formatArgs,
                 onRetry = { players.retry() }
             )
             return
@@ -77,20 +64,23 @@ fun PlayersScreenContent(
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        items(players.itemCount) { index ->
+        items(
+            count = players.itemCount,
+            key = { index -> players.peek(index)?.id ?: index }
+        ) { index ->
             val player = players[index]
             player?.let { item ->
                 PlayerItem(
                     player = item,
                     onOpenDetails = {
-                        navigator.push(PlayerDetailScreen(item.id))
+                        onPlayerClick(item.id)
                     }
                 )
             }
         }
 
         // Handle append state (loading more items)
-        when (loadState.append) {
+        when (val append = loadState.append) {
             is LoadState.Loading -> {
                 item {
                     Box(
@@ -106,6 +96,7 @@ fun PlayersScreenContent(
 
             is LoadState.Error -> {
                 item {
+                    val (messageResId, formatArgs) = errorMessageFor(append.error)
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -113,7 +104,7 @@ fun PlayersScreenContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Button(onClick = { players.retry() }) {
-                            Text(stringResource(id = R.string.error_loading_players))
+                            Text(stringResource(id = messageResId, *formatArgs.toTypedArray()))
                         }
                     }
                 }
@@ -126,3 +117,10 @@ fun PlayersScreenContent(
     }
 }
 
+private fun errorMessageFor(error: Throwable): Pair<Int, List<Any>> {
+    return when (error) {
+        is DataException.Network -> R.string.error_network to emptyList()
+        is DataException.Server -> R.string.error_server to listOf(error.code.toString())
+        else -> R.string.error_loading_players to emptyList()
+    }
+}

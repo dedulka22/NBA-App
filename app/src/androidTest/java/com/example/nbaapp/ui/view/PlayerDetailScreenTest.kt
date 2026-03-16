@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.nbaapp.domain.model.PlayerDetail
 import com.example.nbaapp.domain.model.Team
+import com.example.nbaapp.ui.model.PlayerDetailUiModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,7 +19,6 @@ class PlayerDetailScreenTest {
 
     @Test
     fun playerDetailContentDisplaysPlayerName() {
-        // Mock data for the test
         val mockPlayerDetail = PlayerDetail(
             id = 1,
             firstName = "LeBron",
@@ -39,21 +39,22 @@ class PlayerDetailScreenTest {
                 city = "Los Angeles",
                 conference = "Western",
                 division = "Pacific",
-                image = "https://example.com/lakers.png",
-                name = "Los Angeles Lakers"
-            ),
-            image = "https://example.com/lebron.png"
+                name = "Lakers"
+            )
         )
 
-        // Set the content of the screen
+        val mockUiModel = PlayerDetailUiModel(
+            playerDetail = mockPlayerDetail,
+            imageUrl = ""
+        )
+
         composeTestRule.setContent {
             PlayerDetailContent(
-                playerDetail = mockPlayerDetail,
+                playerDetailUi = mockUiModel,
                 onTeamClick = {}
             )
         }
 
-        // Assert that the player's name is displayed
         composeTestRule.onNodeWithText("LeBron James").assertIsDisplayed()
     }
 }

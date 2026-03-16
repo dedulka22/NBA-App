@@ -31,16 +31,16 @@ data class PlayerDetailData(
     val id: Int,
     @SerializedName("first_name") val firstName: String,
     @SerializedName("last_name") val lastName: String,
-    val position: String,
-    val height: String,
-    val weight: String,
-    @SerializedName("jersey_number") val jerseyNumber: String,
-    val college: String,
-    val country: String,
+    val position: String?,
+    val height: String?,
+    val weight: String?,
+    @SerializedName("jersey_number") val jerseyNumber: String?,
+    val college: String?,
+    val country: String?,
     val team: TeamDto,
-    @SerializedName("draft_year") val draftYear: Int,
-    @SerializedName("draft_round") val draftRound: Int,
-    @SerializedName("draft_number") val draftNumber: Int
+    @SerializedName("draft_year") val draftYear: Int?,
+    @SerializedName("draft_round") val draftRound: Int?,
+    @SerializedName("draft_number") val draftNumber: Int?
 )
 
 /**
@@ -52,15 +52,15 @@ fun PlayerDetailResponse.toDomain(): PlayerDetail {
         id = playerData.id,
         firstName = playerData.firstName,
         lastName = playerData.lastName,
-        position = playerData.position,
-        height = playerData.height,
-        weight = playerData.weight,
-        jerseyNumber = playerData.jerseyNumber,
-        college = playerData.college,
-        country = playerData.country,
+        position = playerData.position.orEmpty(),
+        height = playerData.height.orEmpty(),
+        weight = playerData.weight.orEmpty(),
+        jerseyNumber = playerData.jerseyNumber.orEmpty(),
+        college = playerData.college.orEmpty(),
+        country = playerData.country.orEmpty(),
         team = playerData.team.toDomain(),
-        draftYear = playerData.draftYear,
-        draftRound = playerData.draftRound,
-        draftNumber = playerData.draftNumber
+        draftYear = playerData.draftYear ?: 0,
+        draftRound = playerData.draftRound ?: 0,
+        draftNumber = playerData.draftNumber ?: 0
     )
 }

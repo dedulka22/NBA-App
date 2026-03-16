@@ -1,8 +1,11 @@
 package com.example.nbaapp.domain.usecase
 
+import com.example.nbaapp.domain.model.PlayerDetail
 import com.example.nbaapp.domain.repository.ImageRepository
+import com.example.nbaapp.domain.repository.ImageRepository.Companion.DEFAULT_IMAGE_URL
+import com.example.nbaapp.domain.repository.ImageRepository.Companion.IMAGE_FETCH_TIMEOUT_MS
 import com.example.nbaapp.domain.repository.PlayerDetailRepository
-import com.example.nbaapp.ui.model.PlayerDetailUiModel
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Use case for getting player details with image.
@@ -15,14 +18,13 @@ class GetPlayerDetailUseCase(
     private val playerDetailRepository: PlayerDetailRepository,
     private val imageRepository: ImageRepository
 ) {
-    suspend operator fun invoke(playerId: Int): PlayerDetailUiModel {
+    suspend operator fun invoke(playerId: Int): Pair<PlayerDetail, String> {
         val playerDetail = playerDetailRepository.getPlayerDetail(playerId)
-        val imageUrl =
+        val imageUrl = withTimeoutOrNull(IMAGE_FETCH_TIMEOUT_MS) {
             imageRepository.getImageUrl("${playerDetail.firstName} ${playerDetail.lastName} basketball")
+        } ?: DEFAULT_IMAGE_URL
 
-        return PlayerDetailUiModel(
-            playerDetail = playerDetail,
-            imageUrl = imageUrl
-        )
+        return Pair(playerDetail, imageUrl)
     }
+
 }

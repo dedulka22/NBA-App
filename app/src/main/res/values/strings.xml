@@ -15,4 +15,16 @@
     <string name="conference">Conference: %1$s</string>
     <string name="division">Division: %1$s</string>
     <string name="error_loading_players">Error loading players</string>
+    <string name="error_title">Error</string>
+    <string name="retry">Retry</string>
+    <string name="content_description_image">Image</string>
+    <string name="content_description_basketball_loading">Basketball Loading</string>
+    <string name="content_description_basketball_icon">Basketball Icon</string>
+    <string name="content_description_back">Back</string>
+    <string name="content_description_team_detail">Team Detail</string>
+    <string name="screen_title_players">National Basketball Association</string>
+    <string name="screen_title_player_detail">Player Detail</string>
+    <string name="screen_title_team_detail">Team Detail</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_server">Server error (%1$s). Please try again later.</string>
 </resources>

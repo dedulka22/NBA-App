@@ -10,9 +10,15 @@ import retrofit2.http.Query
  */
 interface UnsplashApi {
 
-    @GET("search/photos")
+    @GET(ENDPOINT_SEARCH_PHOTOS)
     suspend fun showImageNBA(
-        @Query("page") page: Int,
-        @Query("query") query: String
+        @Query(PARAM_PAGE) page: Int,
+        @Query(PARAM_QUERY) query: String
     ): UnsplashImageResponse
+
+    companion object {
+        const val ENDPOINT_SEARCH_PHOTOS = "search/photos"
+        const val PARAM_PAGE = "page"
+        const val PARAM_QUERY = "query"
+    }
 }

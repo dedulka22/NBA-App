@@ -23,7 +23,7 @@ data class PlayerDetailUiModel(
     val college: String get() = playerDetail.college
     val jerseyNumber: String get() = playerDetail.jerseyNumber
     val country: String get() = playerDetail.country
-    val team: TeamUiModel get() = TeamUiModel(playerDetail.team, imageUrl = "")
+    val team: TeamUiModel get() = TeamUiModel(playerDetail.team, imageUrl = imageUrl)
     val draftYear: Int get() = playerDetail.draftYear
     val draftRound: Int get() = playerDetail.draftRound
     val draftNumber: Int get() = playerDetail.draftNumber

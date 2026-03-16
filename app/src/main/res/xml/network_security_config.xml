@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.balldontlie.io</domain>
+        <domain includeSubdomains="true">api.unsplash.com</domain>
+    </domain-config>
+</network-security-config>
